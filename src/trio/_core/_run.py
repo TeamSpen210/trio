@@ -72,9 +72,12 @@ if TYPE_CHECKING:
     import outcome
     from typing_extensions import Self, TypeVar, TypeVarTuple, Unpack
 
+    from . import _nursery_start as _nstart
+
     PosArgT = TypeVarTuple("PosArgT")
     StatusT = TypeVar("StatusT", default=None)
     StatusT_contra = TypeVar("StatusT_contra", contravariant=True, default=None)
+
 else:
     from typing import TypeVar
 
@@ -1196,12 +1199,240 @@ class Nursery(metaclass=NoPublicConstructor):
         """
         GLOBAL_RUN_CONTEXT.runner.spawn_impl(async_fn, args, self, name)
 
+    # GEN NURSERY START
+    # fmt: off
+    @overload  # Note - unary async_fn can be passed by keyword!
+    async def start(self, async_fn: _nstart.Func0[StatusT], *, name: object = None) -> StatusT: ...
+    @overload
     async def start(
-        self,
-        async_fn: Callable[..., Awaitable[object]],
-        *args: object,
+        self, async_fn: _nstart.Func1[_nstart.Arg1, StatusT],
+        arg1: _nstart.Arg1,
+        /, *,
         name: object = None,
-    ) -> Any:
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func2[_nstart.Arg1, _nstart.Arg2, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func3[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func4[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func5[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func6[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func7[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func8[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func9[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func10[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func11[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func12[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func13[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func14[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func15[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func16[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func17[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func18[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func19[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func20[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func21[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func22[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func23[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func24[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func25[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func26[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func27[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func28[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, _nstart.Arg28, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27, arg28: _nstart.Arg28,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func29[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, _nstart.Arg28, _nstart.Arg29, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27, arg28: _nstart.Arg28, arg29: _nstart.Arg29,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func30[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, _nstart.Arg28, _nstart.Arg29, _nstart.Arg30, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27, arg28: _nstart.Arg28, arg29: _nstart.Arg29, arg30: _nstart.Arg30,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func31[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, _nstart.Arg28, _nstart.Arg29, _nstart.Arg30, _nstart.Arg31, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27, arg28: _nstart.Arg28, arg29: _nstart.Arg29, arg30: _nstart.Arg30, arg31: _nstart.Arg31,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    @overload
+    async def start(
+        self, async_fn: _nstart.Func32[_nstart.Arg1, _nstart.Arg2, _nstart.Arg3, _nstart.Arg4, _nstart.Arg5, _nstart.Arg6, _nstart.Arg7, _nstart.Arg8, _nstart.Arg9, _nstart.Arg10, _nstart.Arg11, _nstart.Arg12, _nstart.Arg13, _nstart.Arg14, _nstart.Arg15, _nstart.Arg16, _nstart.Arg17, _nstart.Arg18, _nstart.Arg19, _nstart.Arg20, _nstart.Arg21, _nstart.Arg22, _nstart.Arg23, _nstart.Arg24, _nstart.Arg25, _nstart.Arg26, _nstart.Arg27, _nstart.Arg28, _nstart.Arg29, _nstart.Arg30, _nstart.Arg31, _nstart.Arg32, StatusT],
+        arg1: _nstart.Arg1, arg2: _nstart.Arg2, arg3: _nstart.Arg3, arg4: _nstart.Arg4, arg5: _nstart.Arg5, arg6: _nstart.Arg6, arg7: _nstart.Arg7, arg8: _nstart.Arg8, arg9: _nstart.Arg9, arg10: _nstart.Arg10, arg11: _nstart.Arg11, arg12: _nstart.Arg12, arg13: _nstart.Arg13, arg14: _nstart.Arg14, arg15: _nstart.Arg15, arg16: _nstart.Arg16, arg17: _nstart.Arg17, arg18: _nstart.Arg18, arg19: _nstart.Arg19, arg20: _nstart.Arg20, arg21: _nstart.Arg21, arg22: _nstart.Arg22, arg23: _nstart.Arg23, arg24: _nstart.Arg24, arg25: _nstart.Arg25, arg26: _nstart.Arg26, arg27: _nstart.Arg27, arg28: _nstart.Arg28, arg29: _nstart.Arg29, arg30: _nstart.Arg30, arg31: _nstart.Arg31, arg32: _nstart.Arg32,
+        /, *,
+        name: object = None,
+    ) -> StatusT: ...
+    # fmt: on
+    # GEN NURSERY END
+
+    async def start(  # type: ignore[misc]  # Incompatible overloads.
+        self, async_fn: _nstart.FuncImpl[StatusT], *args: object, name: object = None
+    ) -> StatusT:
         r"""Creates and initializes a child task.
 
         Like :meth:`start_soon`, but blocks until the new task has
