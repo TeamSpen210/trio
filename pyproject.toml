@@ -144,6 +144,9 @@ extend-ignore = [
 'src/trio/lowlevel.py' = ['F401']
 'src/trio/socket.py' = ['F401']
 'src/trio/testing/__init__.py' = ['F401']
+# Ignore unused local variables inside type-tests. Those
+# are used to check that types are compatible.
+'**/type_tests/*.py' = ['F841']
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
