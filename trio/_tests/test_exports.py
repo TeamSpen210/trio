@@ -104,7 +104,6 @@ if TYPE_CHECKING:
 @pytest.fixture(scope="module")
 def all_symbol_results() -> SymbolResults:
     """Calling the static tools takes a long time, but this can be parallelized."""
-    import jedi
     from pylint.lint import PyLinter
 
     data: SymbolResults = {}
@@ -122,14 +121,6 @@ def all_symbol_results() -> SymbolResults:
         linter = PyLinter()
         ast = await trio.to_thread.run_sync(linter.get_ast, module.__file__, modname)
         return no_underscores(ast)
-
-    async def run_jedi(modname: str) -> set[str]:
-        # Simulate typing "import trio; trio.<TAB>"
-        script = await trio.to_thread.run_sync(
-            jedi.Script, f"import {modname}; {modname}."
-        )
-        completions = await trio.to_thread.run_sync(script.complete)
-        return no_underscores(c.name for c in completions)
 
     mypy_cache = Path.cwd() / ".mypy_cache"
     _ensure_mypy_cache_updated()
@@ -159,6 +150,7 @@ def all_symbol_results() -> SymbolResults:
         res = await trio.run_process(
             ["pyright", f"--verifytypes={modname}", "--outputjson"],
             capture_stdout=True,
+            check=False,
         )
         current_result = json.loads(res.stdout)
         return {
@@ -167,11 +159,10 @@ def all_symbol_results() -> SymbolResults:
             if x["name"].startswith(modname)
         }
 
-    async def fill_data():
+    async def fill_data() -> None:
         async with trio.open_nursery() as nursery:
             for modname in PUBLIC_MODULE_NAMES:
                 nursery.start_soon(capture, run_pylint, "pylint", modname)
-                nursery.start_soon(capture, run_jedi, "jedi", modname)
                 if RUN_SLOW:  # pragma: no branch
                     nursery.start_soon(capture, run_mypy, "mypy", modname)
                     nursery.start_soon(
@@ -228,7 +219,16 @@ async def test_static_tool_sees_all_symbols(
         if not RUN_SLOW:  # pragma: no cover
             pytest.skip("use --run-slow to check against mypy")
 
-    static_names = all_symbol_results[tool, modname].unwrap()
+    if tool == "jedi":
+        # Jedi itself parallelizes, which breaks Trio.
+        import jedi
+
+        # Simulate typing "import trio; trio.<TAB>"
+        script = jedi.Script(f"import {modname}; {modname}.")
+        completions = script.complete()
+        static_names = no_underscores(c.name for c in completions)
+    else:
+        static_names = all_symbol_results[tool, modname].unwrap()
 
     if tool == "pyright_verifytypes":
         # pyright ignores the symbol defined behind `if False`
