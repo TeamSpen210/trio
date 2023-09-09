@@ -8,11 +8,13 @@ import inspect
 import json
 import socket as stdlib_socket
 import sys
+from collections.abc import Awaitable, Callable, Iterable
 from pathlib import Path
 from types import ModuleType
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import attrs
+import outcome
 import pytest
 
 import trio
@@ -84,8 +86,101 @@ def public_modules(module):
         yield from public_modules(class_)
 
 
+def no_underscores(symbols: Iterable[str]) -> set[str]:
+    """Strip underscored names from a list of symbols."""
+    return {symbol for symbol in symbols if not symbol.startswith("_")}
+
+
 PUBLIC_MODULES = list(public_modules(trio))
 PUBLIC_MODULE_NAMES = [m.__name__ for m in PUBLIC_MODULES]
+
+if TYPE_CHECKING:
+    from typing_extensions import Literal, TypeAlias
+
+    Tools: TypeAlias = Literal["pylint", "jedi", "mypy", "pyright_verifytypes"]
+    SymbolResults: TypeAlias = dict[tuple[Tools, str], outcome.Outcome[set[str]]]
+
+
+@pytest.fixture(scope="module")
+def all_symbol_results() -> SymbolResults:
+    """Calling the static tools takes a long time, but this can be parallelized."""
+    import jedi
+    from pylint.lint import PyLinter
+
+    data: SymbolResults = {}
+
+    async def capture(
+        func: Callable[[str], Awaitable[set[str]]],
+        tool: Tools,
+        modname: str,
+    ) -> None:
+        """Run one of the other run_ functions, and store the result."""
+        data[tool, modname] = await outcome.acapture(func, modname)
+
+    async def run_pylint(modname: str) -> set[str]:
+        module = importlib.import_module(modname)
+        linter = PyLinter()
+        ast = await trio.to_thread.run_sync(linter.get_ast, module.__file__, modname)
+        return no_underscores(ast)
+
+    async def run_jedi(modname: str) -> set[str]:
+        # Simulate typing "import trio; trio.<TAB>"
+        script = await trio.to_thread.run_sync(
+            jedi.Script, f"import {modname}; {modname}."
+        )
+        completions = await trio.to_thread.run_sync(script.complete)
+        return no_underscores(c.name for c in completions)
+
+    mypy_cache = Path.cwd() / ".mypy_cache"
+    _ensure_mypy_cache_updated()
+    trio_cache = next(mypy_cache.glob("*/trio"))
+
+    async def run_mypy(modname: str) -> set[str]:
+        _, modname = (modname + ".").split(".", 1)
+        modname = modname[:-1]
+        mod_cache = trio_cache / modname if modname else trio_cache
+        if mod_cache.is_dir():
+            mod_cache = mod_cache / "__init__.data.json"
+        else:
+            mod_cache = trio_cache / (modname + ".data.json")
+
+        assert mod_cache.exists() and mod_cache.is_file()
+        async with await trio.open_file(mod_cache) as cache_file:
+            cache_json = await trio.to_thread.run_sync(
+                json.loads, await cache_file.read()
+            )
+        return no_underscores(
+            key
+            for key, value in cache_json["names"].items()
+            if not key.startswith(".") and value["kind"] == "Gdef"
+        )
+
+    async def run_pyright_verifytypes(modname: str) -> set[str]:
+        res = await trio.run_process(
+            ["pyright", f"--verifytypes={modname}", "--outputjson"],
+            capture_stdout=True,
+        )
+        current_result = json.loads(res.stdout)
+        return {
+            x["name"][len(modname) + 1 :]
+            for x in current_result["typeCompleteness"]["symbols"]
+            if x["name"].startswith(modname)
+        }
+
+    async def fill_data():
+        async with trio.open_nursery() as nursery:
+            for modname in PUBLIC_MODULE_NAMES:
+                nursery.start_soon(capture, run_pylint, "pylint", modname)
+                nursery.start_soon(capture, run_jedi, "jedi", modname)
+                if RUN_SLOW:  # pragma: no branch
+                    nursery.start_soon(capture, run_mypy, "mypy", modname)
+                    nursery.start_soon(
+                        capture, run_pyright_verifytypes, "pyright_verifytypes", modname
+                    )
+
+    trio.run(fill_data)
+
+    return data
 
 
 # It doesn't make sense for downstream redistributors to run this test, since
@@ -105,11 +200,13 @@ PUBLIC_MODULE_NAMES = [m.__name__ for m in PUBLIC_MODULES]
     # https://github.com/pypa/setuptools/issues/3274
     "ignore:module 'sre_constants' is deprecated:DeprecationWarning",
 )
-def test_static_tool_sees_all_symbols(tool, modname, tmpdir):
+async def test_static_tool_sees_all_symbols(
+    tool: Tools,
+    modname: str,
+    tmpdir: Path,
+    all_symbol_results: SymbolResults,
+) -> None:
     module = importlib.import_module(modname)
-
-    def no_underscores(symbols):
-        return {symbol for symbol in symbols if not symbol.startswith("_")}
 
     runtime_names = no_underscores(dir(module))
 
@@ -122,63 +219,18 @@ def test_static_tool_sees_all_symbols(tool, modname, tmpdir):
         if getattr(module, name, None) is getattr(__future__, name):
             runtime_names.remove(name)
 
-    if tool == "pylint":
-        from pylint.lint import PyLinter
-
-        linter = PyLinter()
-        ast = linter.get_ast(module.__file__, modname)
-        static_names = no_underscores(ast)
-    elif tool == "jedi":
-        import jedi
-
-        # Simulate typing "import trio; trio.<TAB>"
-        script = jedi.Script(f"import {modname}; {modname}.")
-        completions = script.complete()
-        static_names = no_underscores(c.name for c in completions)
-    elif tool == "mypy":
+    if tool == "mypy":
         if not RUN_SLOW:  # pragma: no cover
             pytest.skip("use --run-slow to check against mypy")
         if sys.implementation.name != "cpython":
             pytest.skip("mypy not installed in tests on pypy")
-
-        cache = Path.cwd() / ".mypy_cache"
-
-        _ensure_mypy_cache_updated()
-
-        trio_cache = next(cache.glob("*/trio"))
-        _, modname = (modname + ".").split(".", 1)
-        modname = modname[:-1]
-        mod_cache = trio_cache / modname if modname else trio_cache
-        if mod_cache.is_dir():
-            mod_cache = mod_cache / "__init__.data.json"
-        else:
-            mod_cache = trio_cache / (modname + ".data.json")
-
-        assert mod_cache.exists() and mod_cache.is_file()
-        with mod_cache.open() as cache_file:
-            cache_json = json.loads(cache_file.read())
-            static_names = no_underscores(
-                key
-                for key, value in cache_json["names"].items()
-                if not key.startswith(".") and value["kind"] == "Gdef"
-            )
     elif tool == "pyright_verifytypes":
         if not RUN_SLOW:  # pragma: no cover
             pytest.skip("use --run-slow to check against mypy")
-        import subprocess
 
-        res = subprocess.run(
-            ["pyright", f"--verifytypes={modname}", "--outputjson"],
-            capture_output=True,
-        )
-        current_result = json.loads(res.stdout)
+    static_names = all_symbol_results[tool, modname].unwrap()
 
-        static_names = {
-            x["name"][len(modname) + 1 :]
-            for x in current_result["typeCompleteness"]["symbols"]
-            if x["name"].startswith(modname)
-        }
-
+    if tool == "pyright_verifytypes":
         # pyright ignores the symbol defined behind `if False`
         if modname == "trio":
             static_names.add("testing")
@@ -190,9 +242,6 @@ def test_static_tool_sees_all_symbols(tool, modname, tmpdir):
             ignored_missing_names = {"if_indextoname", "if_nameindex", "if_nametoindex"}
             assert static_names.isdisjoint(ignored_missing_names)
             static_names.update(ignored_missing_names)
-
-    else:  # pragma: no cover
-        assert False
 
     # mypy handles errors with an `assert` in its branch
     if tool == "mypy":
