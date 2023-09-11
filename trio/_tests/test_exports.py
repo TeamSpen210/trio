@@ -103,7 +103,13 @@ if TYPE_CHECKING:
 
 @pytest.fixture(scope="module")
 def all_symbol_results() -> SymbolResults:
-    """Calling the static tools takes a long time, but this can be parallelized."""
+    """Runs the tools for test_static_tool_sees_all_symbols in parallel.
+
+    Calling the static tools takes a long time, but this can be parallelized.
+
+    This "fixture" runs all the tools in parallel, and collects outputs (including any failures).
+    test_static_tool_sees_all_symbols() then unpacks the result and checks it for validity.
+    """
     from pylint.lint import PyLinter
 
     data: SymbolResults = {}
@@ -169,6 +175,7 @@ def all_symbol_results() -> SymbolResults:
                         capture, run_pyright_verifytypes, "pyright_verifytypes", modname
                     )
 
+    # We can't have module-scoped async fixtures, so just call trio.run() here.
     trio.run(fill_data)
 
     return data
