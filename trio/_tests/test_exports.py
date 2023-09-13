@@ -175,6 +175,9 @@ def all_symbol_results() -> SymbolResults:
         }
 
     async def fill_data() -> None:
+        # Run pyright once to ensure it has installed itself.
+        await trio.run_process(["pyright", "--version"])
+        # Then run all the checks concurrently.
         async with trio.open_nursery() as nursery:
             for modname in PUBLIC_MODULE_NAMES:
                 nursery.start_soon(capture, run_pylint, "pylint", modname)
