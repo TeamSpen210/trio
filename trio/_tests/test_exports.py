@@ -159,10 +159,15 @@ def all_symbol_results() -> SymbolResults:
             capture_stderr=True,
             check=False,
         )
-        if res.returncode > 1:  # pragma: no cover
+        if res.returncode > 1 or not res.stdout:  # pragma: no cover
             # 1 = type errors detected, that is fine.
             raise ValueError(res)
-        current_result = json.loads(res.stdout)
+        try:
+            current_result = json.loads(res.stdout)
+        except json.JSONDecodeError as exc:  # pragma: no branch
+            # Include the process results with the error.
+            raise ValueError(res) from exc
+
         return {
             x["name"][len(modname) + 1 :]
             for x in current_result["typeCompleteness"]["symbols"]
