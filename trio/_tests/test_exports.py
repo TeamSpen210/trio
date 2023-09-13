@@ -128,29 +128,36 @@ def all_symbol_results() -> SymbolResults:
         ast = await trio.to_thread.run_sync(linter.get_ast, module.__file__, modname)
         return no_underscores(ast)
 
-    mypy_cache = Path.cwd() / ".mypy_cache"
-    _ensure_mypy_cache_updated()
-    trio_cache = next(mypy_cache.glob("*/trio"))
+    if sys.implementation.name == "cpython":
+        # Mypy is skipped on pypy.
+        mypy_cache = Path.cwd() / ".mypy_cache"
+        _ensure_mypy_cache_updated()
+        trio_cache = next(mypy_cache.glob("*/trio"))
 
-    async def run_mypy(modname: str) -> set[str]:
-        _, modname = (modname + ".").split(".", 1)
-        modname = modname[:-1]
-        mod_cache = trio_cache / modname if modname else trio_cache
-        if mod_cache.is_dir():
-            mod_cache = mod_cache / "__init__.data.json"
-        else:
-            mod_cache = trio_cache / (modname + ".data.json")
+        async def run_mypy(modname: str) -> set[str]:
+            _, modname = (modname + ".").split(".", 1)
+            modname = modname[:-1]
+            mod_cache = trio_cache / modname if modname else trio_cache
+            if mod_cache.is_dir():
+                mod_cache = mod_cache / "__init__.data.json"
+            else:
+                mod_cache = trio_cache / (modname + ".data.json")
 
-        assert mod_cache.exists() and mod_cache.is_file()
-        async with await trio.open_file(mod_cache) as cache_file:
-            cache_json = await trio.to_thread.run_sync(
-                json.loads, await cache_file.read()
+            assert mod_cache.exists() and mod_cache.is_file()
+            async with await trio.open_file(mod_cache) as cache_file:
+                cache_json = await trio.to_thread.run_sync(
+                    json.loads, await cache_file.read()
+                )
+            return no_underscores(
+                key
+                for key, value in cache_json["names"].items()
+                if not key.startswith(".") and value["kind"] == "Gdef"
             )
-        return no_underscores(
-            key
-            for key, value in cache_json["names"].items()
-            if not key.startswith(".") and value["kind"] == "Gdef"
-        )
+
+    else:
+
+        async def run_mypy(modname: str) -> set[str]:
+            raise NotImplementedError
 
     async def run_pyright_verifytypes(modname: str) -> set[str]:
         res = await trio.run_process(
