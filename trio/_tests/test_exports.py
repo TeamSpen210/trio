@@ -156,8 +156,12 @@ def all_symbol_results() -> SymbolResults:
         res = await trio.run_process(
             ["pyright", f"--verifytypes={modname}", "--outputjson"],
             capture_stdout=True,
+            capture_stderr=True,
             check=False,
         )
+        if res.returncode > 1:  # pragma: no cover
+            # 1 = type errors detected, that is fine.
+            raise ValueError(res)
         current_result = json.loads(res.stdout)
         return {
             x["name"][len(modname) + 1 :]
