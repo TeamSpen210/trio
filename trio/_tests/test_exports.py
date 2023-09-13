@@ -11,7 +11,7 @@ import sys
 from collections.abc import Awaitable, Callable, Iterable
 from pathlib import Path
 from types import ModuleType
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Dict, Protocol, Set, Tuple
 
 import attrs
 import outcome
@@ -98,7 +98,7 @@ if TYPE_CHECKING:
     from typing_extensions import Literal, TypeAlias
 
     Tools: TypeAlias = Literal["pylint", "jedi", "mypy", "pyright_verifytypes"]
-    SymbolResults: TypeAlias = dict[tuple[Tools, str], outcome.Outcome[set[str]]]
+    SymbolResults: TypeAlias = Dict[Tuple[Tools, str], outcome.Outcome[Set[str]]]
 
 
 @pytest.fixture(scope="module")
